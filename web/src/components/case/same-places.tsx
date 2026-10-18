@@ -72,7 +72,7 @@ export function SamePlaces() {
           </div>
           <div className="legend">
             <span>
-              <i className="sq" style={{ background: "#ffe2b8" }} />
+              <i className="sq" style={{ background: "#ffc48c" }} />
               {tr(lang, { en: "this week, burned before", id: "minggu ini, pernah terbakar" })}
             </span>
             <span>
@@ -80,7 +80,7 @@ export function SamePlaces() {
               {tr(lang, { en: "this week, new place", id: "minggu ini, tempat baru" })}
             </span>
             <span>
-              <i className="sq" style={{ background: "#7e968c" }} />
+              <i className="sq" style={{ background: "#6e887e" }} />
               {tr(lang, { en: "burned in a chosen past year", id: "terbakar di tahun yang dipilih" })}
             </span>
           </div>

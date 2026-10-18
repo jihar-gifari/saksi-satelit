@@ -1,9 +1,9 @@
 "use client";
 import { WeekBars } from "@/components/charts/week-bars";
 import { sceneStore, useSceneState } from "@/components/map/scene";
-import { Know } from "@/components/site/know";
+import { Know, KnowLink } from "@/components/site/know";
 import { useReady, type WeekRank } from "@/lib/data";
-import { fmtInt, fmtRange, fmtTimes, ordinal } from "@/lib/format";
+import { fmtDay, fmtInt, fmtRange, fmtTimes, ordinal } from "@/lib/format";
 import { T, tr, useLang } from "@/lib/i18n";
 import { ChapterHead } from "./chapter";
 import { weekKnow } from "./how-bad";
@@ -76,7 +76,7 @@ export function Papua() {
                 </div>
               ) : null}
               {papua.independent ? (
-                <div className="stat">
+                <div className="stat stat--ind">
                   <b className="num ember">{fmtInt(papua.independent.ha, lang)} ha</b>
                   <span>
                     {tr(lang, { en: "Independent", id: "Independen" })}
@@ -85,6 +85,27 @@ export function Papua() {
                 </div>
               ) : null}
             </div>
+          ) : null}
+          {papua.official || papua.independent ? (
+            <KnowLink
+              item={{
+                title: { en: "Burned area in Papua Selatan", id: "Luas terbakar di Papua Selatan" },
+                source: {
+                  en: `Official: ${papua.official?.source ?? "SiPongi"} (Sumber: SIPONGI KEMENHUT). Independent: ${papua.independent?.source ?? ""}.`,
+                  id: `Resmi: ${papua.official?.source ?? "SiPongi"} (Sumber: SIPONGI KEMENHUT). Independen: ${papua.independent?.source ?? ""}.`,
+                },
+                window: {
+                  en: `Official: January to July 2026 (and all of 2025). Independent: ${papua.independent?.window ? fmtRange(papua.independent.window[0], papua.independent.window[1], "en") : "as published"}.`,
+                  id: `Resmi: Januari sampai Juli 2026 (dan seluruh 2025). Independen: ${papua.independent?.window ? fmtRange(papua.independent.window[0], papua.independent.window[1], "id") : "sesuai publikasi"}.`,
+                },
+                method: {
+                  en: "Both are burned-area estimates for the province, not detections. The windows differ by a month, so the two numbers are not a like-for-like comparison; they are shown side by side, not subtracted.",
+                  id: "Keduanya perkiraan luas terbakar untuk provinsi, bukan deteksi. Rentang waktunya berbeda satu bulan, jadi kedua angka tidak setara; ditampilkan berdampingan, tidak dikurangkan.",
+                },
+                links: papua.independent?.url ? [{ label: "downtoearth.org.in", href: papua.independent.url }] : undefined,
+                anchor: "papua",
+              }}
+            />
           ) : null}
           {papua.walhi_psn_hotspots_jan_aug ? (
             <p className="small">
@@ -110,6 +131,11 @@ export function Papua() {
               <button type="button" className="chip" aria-pressed={smoke} onClick={() => sceneStore.set({ smoke: !smoke })}>
                 {tr(lang, { en: "Show the smoke (NASA true colour)", id: "Tampilkan asap (citra NASA)" })}
               </button>
+              {smoke && summary?.as_of ? (
+                <span className="src smoke-credit">
+                  {tr(lang, { en: "Imagery", id: "Citra" })}: NASA GIBS, VIIRS NOAA-20, {fmtDay(summary.as_of, lang)}
+                </span>
+              ) : null}
             </div>
           ) : null}
           <PolicyCheck chapter="papua" inCard />

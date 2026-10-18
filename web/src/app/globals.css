@@ -708,11 +708,16 @@ main {
   inset: 0;
   pointer-events: none;
   background: radial-gradient(120% 90% at 50% 55%, transparent 55%, rgba(5, 8, 7, 0.72) 100%);
+  transition: background 0.6s var(--ease);
+}
+/* With NASA imagery on, a scrim keeps the type readable over bright cloud. */
+.map-stage.is-smoke .map-stage__vignette {
+  background: linear-gradient(to bottom, rgba(5, 8, 7, 0.82) 0%, rgba(5, 8, 7, 0.35) 34%, rgba(5, 8, 7, 0) 50%, rgba(5, 8, 7, 0.45) 66%, rgba(5, 8, 7, 0.9) 100%);
 }
 .map-stage__credit {
   position: absolute;
-  right: 10px;
-  bottom: 8px;
+  right: var(--gutter);
+  top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 6px);
   z-index: 1;
   font-family: var(--mono);
   font-size: 10.5px;
@@ -1055,12 +1060,15 @@ main {
   display: grid;
   gap: 20px;
   align-content: start;
+  container-type: inline-size;
+  min-width: 0;
 }
 .bignum {
   font-family: var(--display);
   font-weight: 900;
   font-stretch: 122%;
-  font-size: clamp(64px, 13vw, 168px);
+  font-size: clamp(56px, 13vw, 168px);
+  font-size: clamp(52px, 19cqi, 168px);
   line-height: 0.85;
   letter-spacing: -0.035em;
   color: var(--ember);
@@ -1241,6 +1249,7 @@ main {
   }
 }
 .card {
+  container-type: inline-size;
   width: 100%;
   max-width: 540px;
   background: rgba(11, 15, 13, 0.86);
@@ -1360,9 +1369,9 @@ main {
 }
 .countdown__clock {
   display: flex;
-  gap: clamp(14px, 3vw, 28px);
+  gap: clamp(12px, 4cqi, 28px);
   align-items: baseline;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .countdown__clock div {
   display: grid;
@@ -1371,7 +1380,8 @@ main {
   font-family: var(--display);
   font-weight: 900;
   font-stretch: 120%;
-  font-size: clamp(48px, 9vw, 104px);
+  font-size: clamp(40px, 9vw, 104px);
+  font-size: clamp(36px, 14cqi, 104px);
   line-height: 0.9;
   letter-spacing: -0.03em;
 }
@@ -2269,11 +2279,51 @@ html[data-motion="paused"] .pair__sq {
   margin-top: 8px;
 }
 .hub-live {
+  display: grid;
+  gap: 6px;
+  max-width: 360px;
+  margin-top: 18px;
+  padding: 18px 20px;
+  border: 1px solid rgba(231, 236, 231, 0.16);
+  border-radius: 18px;
+  background: rgba(5, 8, 7, 0.55);
+  text-decoration: none;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.25s var(--ease);
+}
+.hub-live:hover {
+  border-color: var(--ember);
+}
+.hub-live__k {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  color: var(--ink-2);
+  gap: 8px;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ember-hot);
+}
+.hub-live__n {
+  font-family: var(--display);
+  font-weight: 900;
+  font-stretch: 120%;
+  font-size: clamp(44px, 6vw, 72px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--ember-white);
+}
+.hub-live__t {
+  font-size: 15px;
+  line-height: 1.4;
+}
+@media (min-width: 1000px) {
+  .hub-live {
+    position: absolute;
+    right: var(--gutter);
+    bottom: clamp(40px, 9vh, 96px);
+    margin: 0;
+  }
 }
 .orbit {
   position: absolute;
@@ -2351,9 +2401,10 @@ html[data-motion="paused"] .pair__sq {
 .step__h {
   font-family: var(--display);
   font-weight: 850;
-  font-stretch: 118%;
-  font-size: clamp(28px, 3.4vw, 40px);
+  font-stretch: 112%;
+  font-size: clamp(26px, 2.3vw, 36px);
   line-height: 1;
+  overflow-wrap: anywhere;
 }
 .cases {
   display: grid;
@@ -2490,4 +2541,20 @@ html[data-motion="paused"] .pair__sq {
   #data > p:last-child {
     grid-column: 3;
   }
+}
+.stat--ind b {
+  color: var(--ember);
+}
+@media (max-width: 520px) {
+  .sharecard__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sharecard img,
+  .sharecard__ph {
+    max-width: 250px;
+  }
+}
+.smoke-credit {
+  align-self: center;
+  flex-basis: 100%;
 }

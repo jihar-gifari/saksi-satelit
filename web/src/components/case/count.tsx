@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { animate } from "motion/react";
 import { useSeen, useWidth, linear } from "@/components/charts/util";
-import { Know } from "@/components/site/know";
+import { Know, KnowLink } from "@/components/site/know";
 import { useData, useReady, type Satellites } from "@/lib/data";
 import { fmtAxis, fmtDay, fmtInt, fmtPct } from "@/lib/format";
 import { T, tr, useLang } from "@/lib/i18n";
@@ -70,7 +70,7 @@ function DayBars({ sat, keys, exampleIdx }: { sat: Satellites; keys: Set<Key>; e
             return (
               <g key={d}>
                 <rect x={x} y={sy(vAll)} width={bwi} height={h - 22 - sy(vAll)} fill="none" stroke="var(--night-control)" strokeDasharray="2 3" rx={2} />
-                <rect className="grow" style={{ transition: "y 0.5s var(--ease), height 0.5s var(--ease), transform 0.9s var(--ease)", transitionDelay: `${i * 40}ms` }} x={x} y={sy(v)} width={bwi} height={Math.max(0.5, h - 22 - sy(v))} fill={i === exampleIdx ? "var(--ember)" : "var(--ember-hot)"} opacity={i === exampleIdx ? 1 : 0.55} rx={2} />
+                <rect className="grow" style={{ transition: "y 0.5s var(--ease), height 0.5s var(--ease), transform 0.9s var(--ease)", transitionDelay: `${i * 40}ms` }} x={x} y={sy(v)} width={bwi} height={Math.max(0.5, h - 22 - sy(v))} fill="var(--ember)" opacity={i === exampleIdx ? 1 : 0.42} rx={2} />
                 <text x={x + bwi / 2} y={h - 6} textAnchor="middle" className={i === exampleIdx ? "t-ember" : undefined}>
                   {fmtDay(d, lang, false).replace(/ \S+$/, "")}
                 </text>
@@ -207,7 +207,7 @@ export function Count() {
           </div>
           <div className="stack">
             <p className="kicker">
-              {day} · {tr(lang, { en: "your count", id: "hitungan Anda" })}
+              {day} · {tr(lang, { en: "your count", id: "hitunganmu" })}
             </p>
             <p className="bignum num" aria-live="polite">
               <Ticker n={n} />
@@ -226,7 +226,7 @@ export function Count() {
               />
             </p>
             <DayBars sat={sat} keys={keys} exampleIdx={idx} />
-            <p className="src">{tr(lang, { en: "Dashed outline: everything counted. Filled: your choice.", id: "Garis putus-putus: semua dihitung. Terisi: pilihan Anda." })}</p>
+            <p className="src">{tr(lang, { en: "Dashed outline: everything counted. Filled: your choice.", id: "Garis putus-putus: semua dihitung. Terisi: pilihanmu." })}</p>
           </div>
         </div>
 
@@ -292,6 +292,19 @@ export function Count() {
                     })}
                   </p>
                 ) : null}
+                <KnowLink
+                  item={{
+                    title: { en: "What vanishes on 2 November", id: "Apa yang hilang pada 2 November" },
+                    source: { en: "NASA Earthdata (end of Suomi-NPP near-real-time deliveries); NASA FIRMS counts for the week shown", id: "NASA Earthdata (akhir pengiriman data hampir waktu nyata Suomi-NPP); hitungan NASA FIRMS untuk minggu yang ditampilkan" },
+                    window: { en: `${fmtDay(sat.days[0]!, "en")} to ${fmtDay(sat.days[sat.days.length - 1]!, "en")}`, id: `${fmtDay(sat.days[0]!, "id")} sampai ${fmtDay(sat.days[sat.days.length - 1]!, "id")}` },
+                    method: {
+                      en: "Suomi-NPP's share of all nominal- and high-confidence detections from the three satellites over the week. For SiPongi, Suomi-NPP's share of the VIIRS detections from the satellites it uses (Suomi-NPP and NOAA-20). One source gives 1 November for the end date.",
+                      id: "Porsi Suomi-NPP dari semua deteksi berkeyakinan nominal dan tinggi dari tiga satelit selama minggu itu. Untuk SiPongi, porsi Suomi-NPP dari deteksi VIIRS satelit yang dipakainya (Suomi-NPP dan NOAA-20). Satu sumber menyebut 1 November sebagai tanggal akhirnya.",
+                    },
+                    links: [{ label: "earthdata.nasa.gov", href: "https://www.earthdata.nasa.gov/data/instruments/viirs/land-near-real-time-data" }],
+                    anchor: "satellites",
+                  }}
+                />
               </div>
             </div>
           </div>

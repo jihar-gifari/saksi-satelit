@@ -27,16 +27,23 @@ const CASES = [
   { n: "05", en: ["Jakarta air", "What satellites and air models say about the air over Jakarta."], id: ["Udara Jakarta", "Apa kata satelit dan model udara tentang udara di atas Jakarta."] },
 ];
 
-function LiveLine() {
+function LiveTile() {
   const lang = useLang();
   const s = useReady("summary");
   const l = s?.last24h;
   if (!l) return null;
   return (
-    <p className="hub-live mono">
-      <span className="dot" aria-hidden="true" />
-      {tr(lang, { en: "Live", id: "Langsung" })} · {fmtInt(l.total, lang)} {tr(lang, { en: "hotspots over Indonesia in the last 24 hours, to", id: "titik panas di Indonesia dalam 24 jam terakhir, sampai" })} {fmtWib(l.end, lang)}
-    </p>
+    <Link href="/karhutla" className="hub-live">
+      <span className="hub-live__k mono">
+        <span className="dot" aria-hidden="true" />
+        {tr(lang, { en: "Live · case 01", id: "Langsung · kasus 01" })}
+      </span>
+      <span className="hub-live__n num">{fmtInt(l.total, lang)}</span>
+      <span className="hub-live__t">{tr(lang, { en: "hotspots seen by satellite over Indonesia in the last 24 hours", id: "titik panas terlihat satelit di Indonesia dalam 24 jam terakhir" })}</span>
+      <span className="src">
+        {tr(lang, { en: "to", id: "sampai" })} {fmtWib(l.end, lang)}
+      </span>
+    </Link>
   );
 }
 
@@ -66,8 +73,8 @@ export function HubPage() {
             speed={0.2}
           />
           <svg className="orbit" viewBox="0 0 1000 1000" aria-hidden="true">
-            <ellipse cx="500" cy="500" rx="470" ry="150" transform="rotate(-18 500 500)" fill="none" stroke="rgba(231,236,231,0.18)" strokeDasharray="2 7" />
-            <ellipse cx="500" cy="500" rx="420" ry="230" transform="rotate(24 500 500)" fill="none" stroke="rgba(231,236,231,0.1)" />
+            <ellipse cx="500" cy="500" rx="470" ry="150" transform="rotate(-18 500 500)" fill="none" stroke="rgba(231,236,231,0.3)" strokeDasharray="2 7" />
+            <ellipse cx="500" cy="500" rx="420" ry="230" transform="rotate(24 500 500)" fill="none" stroke="rgba(231,236,231,0.16)" />
           </svg>
           <span className="orbit__sat" aria-hidden="true" />
           <span className="orbit__sat orbit__sat--b" aria-hidden="true" />
@@ -97,8 +104,8 @@ export function HubPage() {
                   →
                 </span>
               </Link>
-              <LiveLine />
             </div>
+            <LiveTile />
           </div>
         </section>
         <Marquee rows={marquee} />

@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { useSeen } from "@/components/charts/util";
 import { Know, type KnowItem } from "@/components/site/know";
-import { useReady, type Claim, type Numbers, type Pair, type Provinces, type Summary } from "@/lib/data";
+import { useData, useReady, type Claim, type Numbers, type Pair, type Provinces, type Summary } from "@/lib/data";
 import { dayOfYear, fmtDay, fmtInt, fmtRange, fmtTimes, monthShort, parseDay } from "@/lib/format";
 import { T, tr, useLang, type Lang } from "@/lib/i18n";
 import { ChapterHead, Loading } from "./chapter";
@@ -254,11 +254,13 @@ function ClaimRow({ c, ctx }: { c: Claim; ctx: Parameters<typeof fillTemplate>[2
 
 export function NumbersWar() {
   const lang = useLang();
-  const numbers = useReady("numbers");
+  const numbersState = useData("numbers");
+  const numbers = numbersState.status === "ready" ? numbersState.data : null;
   const summary = useReady("summary");
   const provinces = useReady("provinces");
   const ctx = useMemo(() => ({ numbers, provinces, summary }), [numbers, provinces, summary]);
-  const loading = !numbers;
+  const loading = numbersState.status === "loading";
+  if (numbersState.status === "missing") return null;
   const ests = numbers?.estimates?.filter((e) => Number.isFinite(e.hectares)) ?? [];
   if (numbers && !ests.length) return null;
   const off = ests.filter((e) => e.kind === "official").sort((a, b) => (a.window[1] < b.window[1] ? 1 : -1))[0];
@@ -276,14 +278,11 @@ export function NumbersWar() {
             {off && ind ? (
               <div className="grid-2" style={{ marginBottom: "clamp(40px, 6vw, 72px)" }}>
                 <p className="statement">
-                  {tr(lang, {
-                    en: `Official: `,
-                    id: `Resmi: `,
-                  })}
+                  {tr(lang, { en: "Official: ", id: "Resmi: " })}
                   <b className="official">{fmtInt(off.hectares, lang)} ha</b>
-                  {tr(lang, { en: ` to ${fmtDay(off.window[1], "en")}. Independent satellite maps: up to `, id: ` sampai ${fmtDay(off.window[1], "id")}. Peta satelit independen: sampai ` })}
+                  {tr(lang, { en: `, counted to ${fmtDay(off.window[1], "en")}. Independent satellite maps: up to `, id: `, data sampai ${fmtDay(off.window[1], "id")}. Peta satelit independen: hingga ` })}
                   <b>{fmtInt(ind.hectares, lang)} ha</b>
-                  {tr(lang, { en: ` to ${fmtDay(ind.window[1], "en")}.`, id: ` sampai ${fmtDay(ind.window[1], "id")}.` })}
+                  {tr(lang, { en: `, counted to ${fmtDay(ind.window[1], "en")}.`, id: `, data sampai ${fmtDay(ind.window[1], "id")}.` })}
                 </p>
                 <div className="prose">
                   <p>

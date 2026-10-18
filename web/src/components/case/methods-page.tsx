@@ -96,7 +96,7 @@ const SECTIONS: Sec[] = [
     body: [
       {
         en: "Province outlines are geoBoundaries ADM1 (ODbL, from OpenStreetMap), with the 2022 Papua provinces built from their regencies. Detections are assigned to a province by point in polygon. The card is drawn in your browser; nothing is uploaded unless you share it.",
-        id: "Batas provinsi berasal dari geoBoundaries ADM1 (ODbL, dari OpenStreetMap), dengan provinsi Papua 2022 disusun dari kabupatennya. Deteksi dimasukkan ke provinsi berdasarkan titik di dalam poligon. Kartu digambar di peramban Anda; tidak ada yang diunggah kecuali Anda membagikannya.",
+        id: "Batas provinsi berasal dari geoBoundaries ADM1 (ODbL, dari OpenStreetMap), dengan provinsi Papua 2022 disusun dari kabupatennya. Deteksi dimasukkan ke provinsi berdasarkan titik di dalam poligon. Kartu digambar di perambanmu; tidak ada yang diunggah kecuali kamu membagikannya.",
       },
     ],
   },

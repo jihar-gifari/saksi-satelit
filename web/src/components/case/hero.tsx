@@ -4,7 +4,7 @@ import { animate } from "motion/react";
 import { sceneStore, useSceneState } from "@/components/map/scene";
 import { Know } from "@/components/site/know";
 import { useReady } from "@/lib/data";
-import { fmtAgo, fmtInt, fmtWib } from "@/lib/format";
+import { fmtAgo, fmtDay, fmtInt, fmtWib } from "@/lib/format";
 import { T, tr, useLang } from "@/lib/i18n";
 import { EASE, motionOff, useStill } from "@/lib/motion";
 import { MapWindow } from "./window";
@@ -191,6 +191,11 @@ export function Hero() {
                     {tr(lang, { en: "Show the smoke (NASA true colour)", id: "Tampilkan asap (citra NASA)" })}
                   </button>
                 ) : null}
+              {smoke && summary?.as_of ? (
+                <span className="src smoke-credit">
+                  {tr(lang, { en: "Imagery", id: "Citra" })}: NASA GIBS, VIIRS NOAA-20, {fmtDay(summary.as_of, lang)}
+                </span>
+              ) : null}
               </div>
             </div>
           ) : (

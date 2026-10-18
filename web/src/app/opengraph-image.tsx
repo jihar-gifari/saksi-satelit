@@ -23,8 +23,7 @@ export default async function Image() {
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", background: "#0b0f0d", padding: "64px 72px", position: "relative", fontFamily: "Archivo" }}>
-        <div style={{ position: "absolute", left: -200, right: -200, top: 430, height: 1100, borderRadius: "50%", background: "radial-gradient(closest-side, #131c18 92%, #1e3a35 97%, rgba(11,15,13,0) 100%)", display: "flex" }} />
-        <div style={{ position: "absolute", left: 300, right: 300, top: 360, height: 300, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,107,54,0.35), rgba(255,107,54,0))", display: "flex" }} />
+        <div style={{ position: "absolute", left: 640, top: 250, width: 980, height: 980, borderRadius: 490, background: "#111815", border: "2px solid #2b4a44", boxShadow: "0 0 140px 30px rgba(255,107,54,0.22)", display: "flex" }} />
         <div style={{ display: "flex", fontFamily: "Plex", fontSize: 24, color: "#a3b0a9", letterSpacing: 3 }}>CASE 01 · KARHUTLA 2026</div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", fontSize: 150, lineHeight: 0.86, color: "#e7ece7", letterSpacing: -4 }}>SAKSI</div>

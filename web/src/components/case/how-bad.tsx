@@ -4,7 +4,7 @@ import { SeasonChart } from "@/components/charts/season-chart";
 import { WeekBars } from "@/components/charts/week-bars";
 import { linear, useSeen, useWidth } from "@/components/charts/util";
 import { Know, KnowLink, type KnowItem } from "@/components/site/know";
-import { useReady, type Climate, type RegionCode, type WeekRank } from "@/lib/data";
+import { useData, useReady, type Climate, type RegionCode, type WeekRank } from "@/lib/data";
 import { fmtInt, fmtNum, fmtRange, fmtTimes, listYears, ordinal } from "@/lib/format";
 import { T, tr, useLang, type Lang } from "@/lib/i18n";
 import { Reveal } from "@/lib/motion";
@@ -100,17 +100,17 @@ function OniStrip({ climate }: { climate: Climate }) {
 
 export function HowBad() {
   const lang = useLang();
-  const summary = useReady("summary");
+  const summaryState = useData("summary");
+  const summary = summaryState.status === "ready" ? summaryState.data : null;
   const season = useReady("season");
   const climate = useReady("climate");
   const [region, setRegion] = useState<RegionCode>("ID");
-  const s = useReady("summary") ? summary : null;
-  const week = s?.week;
+  const week = summary?.week;
   const regions = week ? (Object.keys(week.regions) as RegionCode[]).filter((r) => REGION_NAMES[r] && week.regions[r]) : [];
   const r = week?.regions[region] ?? week?.regions.ID;
-  const loading = !summary;
+  const loading = summaryState.status === "loading";
 
-  if (summary && !week?.regions.ID) return null;
+  if (summaryState.status === "missing" || (summary && !week?.regions.ID)) return null;
 
   return (
     <section id="how-bad" className="chapter chapter--2 grain" aria-labelledby="how-bad-h">

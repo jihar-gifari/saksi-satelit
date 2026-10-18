@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { WeekBars } from "@/components/charts/week-bars";
-import { Know } from "@/components/site/know";
+import { Know, KnowLink } from "@/components/site/know";
 import { useReady, type Province } from "@/lib/data";
 import { CASE_URL, SHORT_LINK } from "@/lib/base";
 import { fmtInt, fmtRange, ordinal } from "@/lib/format";
@@ -149,7 +149,7 @@ export function YourProvince() {
                   {week ? ` · ${fmtRange(week.start, week.end, lang)}` : ""}
                 </p>
                 {total != null ? (
-                  <p className="bignum num" style={{ fontSize: "clamp(56px, 11vw, 112px)" }}>
+                  <p className="bignum num">
                     {fmtInt(total, lang)}
                     <Know
                       item={{
@@ -203,6 +203,18 @@ export function YourProvince() {
                     </div>
                   ) : null}
                 </div>
+              ) : null}
+              {p.official_ha ? (
+                <KnowLink
+                  item={{
+                    title: { en: "Official burned area", id: "Luas terbakar resmi" },
+                    source: { en: "SiPongi, Kementerian Kehutanan (Sumber: SIPONGI KEMENHUT)", id: "SiPongi, Kementerian Kehutanan (Sumber: SIPONGI KEMENHUT)" },
+                    window: { en: "January to July 2026, as published at retrieval; and all of 2025", id: "Januari sampai Juli 2026, seperti yang terbit saat diambil; dan seluruh 2025" },
+                    method: { en: "SiPongi's indicative burned area by province, as published. Not comparable with the satellite detections above, which count heat, not hectares.", id: "Luas terbakar indikatif SiPongi per provinsi, sesuai publikasi. Tidak bisa dibandingkan dengan deteksi satelit di atas, yang menghitung panas, bukan hektare." },
+                    links: [{ label: "sipongi.gakkum.kehutanan.go.id", href: "https://sipongi.gakkum.kehutanan.go.id/" }],
+                    anchor: "burned-area",
+                  }}
+                />
               ) : null}
               <div className="sharecard">
                 <p className="kicker">{tr(lang, { en: "Share this province's card", id: "Bagikan kartu provinsi ini" })}</p>

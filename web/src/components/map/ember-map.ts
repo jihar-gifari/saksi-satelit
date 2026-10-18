@@ -1,4 +1,4 @@
-import { Map as MLMap, Marker, setWorkerUrl, type LngLatBoundsLike, type StyleSpecification } from "maplibre-gl";
+import { Map as MLMap, setWorkerUrl, type LngLatBoundsLike, type StyleSpecification } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { IconLayer, ScatterplotLayer } from "@deck.gl/layers";
 import { DataFilterExtension } from "@deck.gl/extensions";
@@ -127,7 +127,7 @@ function packHotspots(h: Hotspots): Binary {
     const [r, g, b] = emberColour(frp);
     out.position[i * 2] = p[0]!;
     out.position[i * 2 + 1] = p[1]!;
-    out.colour.set([r, g, b, 14 + 56 * k], i * 4);
+    out.colour.set([r, g, b, 18 + 62 * k], i * 4);
     const [cr, cg, cb] = emberColour(frp * 1.6);
     out.core.set([cr, cg, cb, 60 + 150 * k], i * 4);
     out.size[i] = 5 + 17 * k;
@@ -237,13 +237,14 @@ export class EmberMap {
   private map: MLMap;
   private overlay: MapboxOverlay;
   private sprite = glowSprite();
+  /** One extension instance, reused every frame so layers never rebuild their shaders. */
+  private filterExt = new DataFilterExtension({ filterSize: 2 });
   private hot: Binary | null = null;
   private cells: Binary | null = null;
   private rec: Recurrence | null = null;
   private recCells: { position: [number, number]; mask: number }[] = [];
   private provinces: Provinces | null = null;
   private box: [number, number, number, number] | null = null;
-  private boxMarker: Marker | null = null;
   private state: SceneState | null = null;
   private loaded = false;
   private raf = 0;
@@ -255,6 +256,7 @@ export class EmberMap {
   private introDone = false;
   private flickerT = 0;
   private lastFrame = 0;
+  private lastRender = 0;
   private opacity: Record<Group, number> = { hot: 1, cells: 0, rec: 0 };
   private target: Record<Group, number> = { hot: 1, cells: 0, rec: 0 };
   private sizeScale = 1;
@@ -312,7 +314,6 @@ export class EmberMap {
         this.sizeScale = s;
         if (!this.running) this.render();
       }
-      this.placeBoxMarker();
     });
     this.map.on("resize", () => {
       this.narrow = container.clientWidth < 768;
@@ -321,7 +322,6 @@ export class EmberMap {
 
   destroy() {
     cancelAnimationFrame(this.raf);
-    this.boxMarker?.remove();
     try {
       this.map.removeControl(this.overlay);
     } catch {
@@ -379,9 +379,6 @@ export class EmberMap {
     });
   }
 
-  private placeBoxMarker() {
-    if (!this.boxMarker || !this.box) return;
-  }
 
   private applySmoke() {
     if (!this.loaded) return;
@@ -397,7 +394,7 @@ export class EmberMap {
         });
       }
       this.map.addLayer(
-        { id: "gibs", type: "raster", source: "gibs", paint: { "raster-opacity": 0.92, "raster-brightness-max": 0.82, "raster-saturation": -0.1, "raster-contrast": 0.08, "raster-fade-duration": 300 } },
+        { id: "gibs", type: "raster", source: "gibs", paint: { "raster-opacity": 0.92, "raster-brightness-max": 0.74, "raster-saturation": -0.1, "raster-contrast": 0.08, "raster-fade-duration": 300 } },
         "prov-line",
       );
     } else if (!want && has) {
@@ -604,13 +601,18 @@ export class EmberMap {
       } else this.opacity[g] = this.target[g];
     }
 
-    // Idle flicker while embers are on screen.
+    // Idle flicker while embers are on screen, drawn at about 30 fps when nothing else moves (it is slow and
+    // soft, and this halves the work on phones).
+    const tweening = busy;
     if (this.opacity.hot > 0.01 || this.opacity.cells > 0.01) {
       this.flickerT = (this.flickerT + dt / 2600) % 1;
       busy = true;
     }
 
-    this.render();
+    if (tweening || this.map.isMoving() || now - this.lastRender > 30) {
+      this.lastRender = now;
+      this.render();
+    }
     if (busy) this.raf = requestAnimationFrame(this.tick);
     else this.running = false;
   };
@@ -628,7 +630,7 @@ export class EmberMap {
       const b = this.hot;
       const cut = this.introDone ? 60 : this.cut;
       const data = { length: b.length, attributes: { getPosition: { value: b.position, size: 2 }, getColor: { value: b.colour, size: 4, normalized: true }, getSize: { value: b.size, size: 1 }, getFilterValue: { value: b.filter, size: 2 } } };
-      const common = { data: data as never, iconAtlas: this.sprite as never, iconMapping: ICON_MAPPING, getIcon: () => "glow", sizeUnits: "pixels" as const, billboard: true, parameters: ADDITIVE as never, extensions: [new DataFilterExtension({ filterSize: 2 })], filterTransformSize: true, filterTransformColor: true };
+      const common = { data: data as never, iconAtlas: this.sprite as never, iconMapping: ICON_MAPPING, getIcon: () => "glow", sizeUnits: "pixels" as const, billboard: true, parameters: ADDITIVE as never, extensions: [this.filterExt], filterTransformSize: true, filterTransformColor: true };
       layers.push(
         new IconLayer({ ...common, id: "hot-glow", opacity: this.opacity.hot, sizeScale: s, sizeMinPixels: 1.6, sizeMaxPixels: 46, filterRange: [[-10, cut], [-1, 2]], filterSoftRange: [[-10, cut - 2.5], [-1, 2]] } as never),
       );
@@ -643,7 +645,7 @@ export class EmberMap {
           antialiasing: true,
           opacity: this.opacity.hot,
           parameters: ADDITIVE as never,
-          extensions: [new DataFilterExtension({ filterSize: 2 })],
+          extensions: [this.filterExt],
           filterRange: [[-10, cut], [-1, 2]],
           filterSoftRange: [[-10, cut - 1.5], [-1, 2]],
           filterTransformSize: true,
@@ -665,7 +667,7 @@ export class EmberMap {
     if (this.cells && this.opacity.cells > 0.005) {
       const b = this.cells;
       const data = { length: b.length, attributes: { getPosition: { value: b.position, size: 2 }, getColor: { value: b.colour, size: 4, normalized: true }, getSize: { value: b.size, size: 1 }, getFilterValue: { value: b.filter, size: 2 } } };
-      const common = { data: data as never, iconAtlas: this.sprite as never, iconMapping: ICON_MAPPING, getIcon: () => "glow", sizeUnits: "pixels" as const, billboard: true, parameters: ADDITIVE as never, extensions: [new DataFilterExtension({ filterSize: 2 })], filterTransformSize: true, filterTransformColor: true };
+      const common = { data: data as never, iconAtlas: this.sprite as never, iconMapping: ICON_MAPPING, getIcon: () => "glow", sizeUnits: "pixels" as const, billboard: true, parameters: ADDITIVE as never, extensions: [this.filterExt], filterTransformSize: true, filterTransformColor: true };
       layers.push(new IconLayer({ ...common, id: "cells-glow", opacity: this.opacity.cells, sizeScale: s * 1.1, sizeMinPixels: 2.4, sizeMaxPixels: 80, filterRange: [[-1, 1], [-1, 2]] } as never));
       layers.push(
         new ScatterplotLayer({
@@ -696,9 +698,9 @@ export class EmberMap {
           getFillColor: (d) => {
             const p = d.mask & past;
             const w = d.mask & now;
-            if (p && w) return [255, 226, 184, 235];
-            if (w) return [255, 107, 54, 215];
-            if (p) return [126, 150, 140, 120];
+            if (p && w) return [255, 196, 140, 235];
+            if (w) return [255, 92, 40, 220];
+            if (p) return [110, 136, 126, 105];
             return [0, 0, 0, 0];
           },
           getRadius: 5200,

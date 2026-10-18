@@ -64,7 +64,8 @@ export function Warnings() {
   const lastEvent = t(events[events.length - 1]!.date);
   const b1 = Math.max(Date.UTC(caseYear, 10, 15), lastEvent + 10 * 86400000);
   const narrow = w < 640;
-  const h = narrow ? 210 : 280;
+  const h = narrow ? 210 : 330;
+  const fs = narrow ? 9.5 : 11.5;
   const gap = 14;
   const aW = (w - gap) * (narrow ? 0.3 : 0.32);
   const bX = aW + gap;
@@ -122,27 +123,27 @@ export function Warnings() {
                 <text x={0} y={12} className="t-strong">
                   {firstYear}–{caseYear - 1}
                 </text>
-                <text x={0} y={25} style={{ fontSize: 9.5 }}>
+                <text x={0} y={25} style={{ fontSize: fs }}>
                   {tr(lang, { en: "Suomi-NPP, weekly", id: "Suomi-NPP, mingguan" })}
                 </text>
                 <text x={bX} y={12} className="t-strong">
                   {caseYear}
                 </text>
-                <text x={bX} y={25} style={{ fontSize: 9.5 }}>
+                <text x={bX} y={25} style={{ fontSize: fs }}>
                   {tr(lang, { en: "NOAA-20 high conf., monthly (SiPongi)", id: "NOAA-20 keyakinan tinggi, bulanan (SiPongi)" })}
                 </text>
                 <line className="axis" x1={0} x2={aW} y1={plotBot} y2={plotBot} />
                 <line className="axis" x1={bX} x2={w} y1={plotBot} y2={plotBot} />
                 {areaA ? <path d={areaA} fill="var(--ash)" opacity={0.42} /> : null}
                 {weekly.length ? (
-                  <text x={aW - 2} y={plotTop + 10} textAnchor="end" style={{ fontSize: 9.5 }}>
+                  <text x={aW - 2} y={plotTop + 10} textAnchor="end" style={{ fontSize: fs }}>
                     {tr(lang, { en: "max", id: "maks" })} {fmtAxis(aMax, lang)}
                   </text>
                 ) : null}
                 {Array.from({ length: caseYear - firstYear }, (_, i) => firstYear + i)
                   .filter((y) => (narrow ? (y - firstYear) % 3 === 0 : (y - firstYear) % 2 === 0))
                   .map((y) => (
-                    <text key={y} x={x(Date.UTC(y, 0, 1))} y={plotBot + 14} style={{ fontSize: 9.5 }}>
+                    <text key={y} x={x(Date.UTC(y, 0, 1))} y={plotBot + 14} style={{ fontSize: fs }}>
                       &apos;{String(y).slice(2)}
                     </text>
                   ))}
@@ -154,7 +155,7 @@ export function Warnings() {
                     <g key={k}>
                       <rect className="grow" style={{ transitionDelay: `${i * 50}ms` }} x={xa + 1.5} width={Math.max(1, xb - xa - 3)} y={by(v)} height={plotBot - by(v)} fill="var(--ember)" opacity={k === summary?.as_of?.slice(0, 7) ? 0.55 : 0.8} rx={1.5} />
                       {(narrow ? m % 2 === 0 : true) ? (
-                        <text x={(xa + xb) / 2} y={plotBot + 14} textAnchor="middle" style={{ fontSize: 9.5 }}>
+                        <text x={(xa + xb) / 2} y={plotBot + 14} textAnchor="middle" style={{ fontSize: fs }}>
                           {monthShort(m, lang)}
                         </text>
                       ) : null}
@@ -162,7 +163,7 @@ export function Warnings() {
                   );
                 })}
                 {months.length ? (
-                  <text x={w - 2} y={plotTop + 10} textAnchor="end" style={{ fontSize: 9.5 }}>
+                  <text x={w - 2} y={plotTop + 10} textAnchor="end" style={{ fontSize: fs }}>
                     {tr(lang, { en: "max", id: "maks" })} {fmtInt(bMax, lang)}
                   </text>
                 ) : null}
@@ -179,7 +180,7 @@ export function Warnings() {
                   );
                 })}
                 <line x1={evX} x2={evX} y1={plotTop - 4} y2={plotBot + 16} stroke={kindOf(ev.kind).colour} strokeWidth={1.5} style={{ transition: "all .35s var(--ease)" }} />
-                <text x={Math.min(Math.max(evX, 40), w - 40)} y={h - 2} textAnchor="middle" className="t-strong" style={{ fontSize: 10.5 }}>
+                <text x={Math.min(Math.max(evX, 40), w - 40)} y={h - 2} textAnchor="middle" className="t-strong" style={{ fontSize: narrow ? 10.5 : 13 }}>
                   {fmtDay(ev.date, lang)}
                 </text>
               </svg>
