@@ -124,6 +124,7 @@ def history(provs, grid):
     for y in HIST_YEARS:
         raw = os.path.join(CACHE, 'raw', f'snpp_{y}_Indonesia.csv')
         if not os.path.exists(raw):
+            os.makedirs(os.path.dirname(raw), exist_ok=True)
             print('downloading', y, flush=True)
             data = get_chunked(f'https://firms.modaps.eosdis.nasa.gov/data/country/viirs-snpp/{y}/viirs-snpp_{y}_Indonesia.csv')
             open(raw, 'wb').write(data)
