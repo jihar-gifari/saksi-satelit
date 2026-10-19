@@ -30,7 +30,7 @@ export default async function Image() {
           <div style={{ display: "flex", fontSize: 150, lineHeight: 0.86, color: "#ff6b36", letterSpacing: -4 }}>SATELIT</div>
           <div style={{ display: "flex", marginTop: 28, fontFamily: "Plex", fontSize: 30, color: "#e7ece7" }}>What the satellites saw · Apa yang dilihat satelit</div>
         </div>
-        <div style={{ display: "flex", fontFamily: "Plex", fontSize: 26, color: "#ffb37a" }}>aldrangroup.com/karhutla</div>
+        <div style={{ display: "flex", fontFamily: "Plex", fontSize: 26, color: "#ffb37a" }}>karhutla.aldrangroup.com</div>
       </div>
     ),
     { ...size, fonts: fonts.length ? fonts : undefined },
