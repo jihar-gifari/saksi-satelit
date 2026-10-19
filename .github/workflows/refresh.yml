@@ -1,0 +1,35 @@
+name: Refresh karhutla data
+on:
+  schedule:
+    - cron: '17 */3 * * *'   # every 3 hours; FIRMS updates within ~3 h of each pass
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore history cache
+        uses: actions/cache@v4
+        with:
+          path: pipeline/cache
+          key: firms-history-v1
+      - name: Run pipeline
+        env:
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+        run: python3 pipeline/run.py
+      - name: Commit refreshed data
+        run: |
+          git config user.name "Jihar Gifari"
+          git config user.email "95927946+jihar-gifari@users.noreply.github.com"
+          git add web/public/data pipeline/state
+          git diff --cached --quiet || git commit -m "Refresh karhutla data $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push

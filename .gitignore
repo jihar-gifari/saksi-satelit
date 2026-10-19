@@ -1,0 +1,8 @@
+pipeline/cache/
+__pycache__/
+.env*
+node_modules/
+.next/
+.vercel/
+docs/qa/*.mp4
+docs/qa/*.webm
