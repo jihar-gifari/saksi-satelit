@@ -8,10 +8,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   env: { NEXT_PUBLIC_BASE_PATH: basePath },
-  async redirects() {
-    // The bare vercel.app address has no page of its own (everything lives under the basePath).
-    return [{ source: "/", destination: "/saksi-satelit/karhutla", basePath: false, permanent: false }];
-  },
   async headers() {
     return [
       {

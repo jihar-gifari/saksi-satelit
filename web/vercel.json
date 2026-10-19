@@ -1,0 +1,5 @@
+{
+  "redirects": [
+    { "source": "/", "destination": "/saksi-satelit/karhutla", "permanent": false }
+  ]
+}
