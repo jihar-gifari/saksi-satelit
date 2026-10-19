@@ -89,7 +89,7 @@ for (const size of sizes.filter((s) => !only || only.includes(s.name))) {
   page.on("response", (r) => r.status() >= 400 && log.push(`http ${r.status()}: ${r.url()}`));
 
   // The case page.
-  await page.goto(`${BASE}/karhutla`, { waitUntil: "load" });
+  await page.goto(`${BASE}/karhutla`, { waitUntil: "domcontentloaded", timeout: 90000 });
   await page.waitForTimeout(9000);
   await clickText(page, size.lang === "id" ? "Apa itu titik panas?" : "What is a hotspot?");
   await page.waitForTimeout(1500);
@@ -126,7 +126,7 @@ for (const size of sizes.filter((s) => !only || only.includes(s.name))) {
   await page.locator(".pause").first().click().catch(() => {});
 
   // The hub.
-  await page.goto(`${BASE}/`, { waitUntil: "load" });
+  await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded", timeout: 90000 });
   await page.waitForTimeout(4000);
   const hubH = await page.evaluate(() => document.documentElement.scrollHeight);
   for (let y = 0; y < hubH; y += Math.round(size.height * 0.8)) {

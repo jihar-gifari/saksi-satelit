@@ -106,7 +106,8 @@ export function HowBad() {
   const climate = useReady("climate");
   const [region, setRegion] = useState<RegionCode>("ID");
   const week = summary?.week;
-  const regions = week ? (Object.keys(week.regions) as RegionCode[]).filter((r) => REGION_NAMES[r] && week.regions[r]) : [];
+  // The southern-Papua box is left out here: Papua is told by province (Papua Selatan) in its own chapter.
+  const regions = week ? (Object.keys(week.regions) as RegionCode[]).filter((r) => r !== "PAPS" && REGION_NAMES[r] && week.regions[r]) : [];
   const r = week?.regions[region] ?? week?.regions.ID;
   const loading = summaryState.status === "loading";
 
@@ -191,19 +192,19 @@ export function HowBad() {
           <div className="grid-2" style={{ marginTop: "clamp(64px, 9vw, 120px)" }}>
             <div className="stack">
               <h3 className="h3">
-                <T en="The season, week by week" id="Musim kebakaran, minggu demi minggu" />
+                <T en="The season so far" id="Musim kebakaran sejauh ini" />
               </h3>
               <p className="prose small">
                 <T
-                  en="Each line is one year: the running total of the last seven days of detections, from July to December. 2015, the last great fire year, is the white line."
-                  id="Setiap garis adalah satu tahun: total deteksi tujuh hari terakhir, dari Juli sampai Desember. 2015, tahun kebakaran besar terakhir, adalah garis putih."
+                  en="Each line is one year of Suomi-NPP detections, added up since 1 January, or as a running seven-day total from July. 2015, the last great fire year, is the white line. Use the region buttons above to switch."
+                  id="Setiap garis adalah satu tahun deteksi Suomi-NPP, dijumlahkan sejak 1 Januari, atau sebagai total tujuh hari berjalan sejak Juli. 2015, tahun kebakaran besar terakhir, adalah garis putih. Pakai tombol wilayah di atas untuk berganti."
                 />
               </p>
               {season.coverage_2026 ? (
                 <p className="src">
                   {tr(lang, {
-                    en: `2026 is drawn only where our archive has seven straight days (${fmtRange(season.coverage_2026[0], season.coverage_2026[1], "en")}).`,
-                    id: `2026 hanya digambar pada tanggal yang punya tujuh hari berturut-turut di arsip kami (${fmtRange(season.coverage_2026[0], season.coverage_2026[1], "id")}).`,
+                    en: `2026 in our archive: ${fmtRange(season.coverage_2026[0], season.coverage_2026[1], "en")} (near-real-time data; earlier years are the standard archive).`,
+                    id: `2026 di arsip kami: ${fmtRange(season.coverage_2026[0], season.coverage_2026[1], "id")} (data hampir waktu nyata; tahun-tahun sebelumnya dari arsip standar).`,
                   })}
                 </p>
               ) : null}
@@ -233,7 +234,7 @@ export function HowBad() {
               ) : null}
             </div>
             <div className="stack">
-              <SeasonChart season={season} region={region} highlight={[2015, 2019, 2023]} />
+              <SeasonChart season={season} region={region} regionName={REGION_NAMES[region] ?? REGION_NAMES.ID!} highlight={[2015, 2019, 2023]} />
               <div className="figcap">
                 <span className="legend">
                   <span>

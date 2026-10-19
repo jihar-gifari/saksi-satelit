@@ -1733,7 +1733,7 @@ main {
 .footer a {
   color: var(--ink);
 }
-.footer__big {
+.footer .footer__big {
   font-family: var(--display);
   font-weight: 900;
   font-stretch: 125%;
@@ -1742,12 +1742,12 @@ main {
   line-height: 0.85;
   letter-spacing: -0.035em;
   margin-top: 56px;
-  color: var(--night-3);
+  color: var(--night-control);
   white-space: nowrap;
   overflow: hidden;
 }
-.footer__big span {
-  color: rgba(255, 107, 54, 0.22);
+.footer .footer__big span {
+  color: var(--ember-deep);
 }
 
 /* ------------------------------------------------------- motion off switches ------------------------------------------------------ */
@@ -2258,7 +2258,7 @@ html[data-motion="paused"] .pair__sq {
   position: relative;
   min-height: 100svh;
   display: grid;
-  align-items: end;
+  align-items: start;
   overflow: hidden;
   background: var(--night-0);
 }
@@ -2271,6 +2271,11 @@ html[data-motion="paused"] .pair__sq {
   gap: 16px;
   padding-top: calc(var(--header-h) + 40px);
   padding-bottom: clamp(40px, 9vh, 96px);
+}
+@media (min-width: 1000px) {
+  .hub-hero {
+    align-items: end;
+  }
 }
 .hub-hero__cta {
   display: grid;

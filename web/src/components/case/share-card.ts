@@ -189,7 +189,7 @@ export async function drawCard(input: CardInput): Promise<Blob | null> {
       lang === "id"
         ? r.rank === 1
           ? `Minggu terparah sejak ${r.since ?? 2012} untuk provinsi ini (Suomi-NPP).`
-          : `Terparah ${ordinal(r.rank, "id")} dari ${r.of} sejak ${r.since ?? 2012} untuk provinsi ini (Suomi-NPP).`
+          : `Minggu terparah ${ordinal(r.rank, "id")} dari ${r.of} sejak ${r.since ?? 2012} untuk provinsi ini (Suomi-NPP).`
         : r.rank === 1
           ? `The worst week since ${r.since ?? 2012} for this province (Suomi-NPP).`
           : `The ${ordinal(r.rank, "en")} worst of ${r.of} since ${r.since ?? 2012} for this province (Suomi-NPP).`,

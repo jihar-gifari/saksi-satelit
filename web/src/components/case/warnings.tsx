@@ -9,9 +9,9 @@ import { ChapterHead } from "./chapter";
 /**
  * Warnings vs decisions: every dated warning, decision, action, claim, ruling and budget line from policy.json on
  * one timeline, with the fire behind it, so anyone can see what was known when. The axis is broken in two: the
- * years before 2026 are compressed (Suomi-NPP weekly detections from season.json), and 2026 is stretched (SiPongi's
- * monthly NOAA-20 high-confidence counts, the one consistent series covering all of 2026). Each panel has its own
- * scale and says what it shows.
+ * years before the case year are compressed and the case year is stretched. Both show weekly Suomi-NPP detections
+ * from season.json on one scale; if the archive lacks the case year from 1 January, the second panel falls back to
+ * SiPongi's monthly NOAA-20 high-confidence counts on its own scale, and says so.
  */
 const KINDS: Record<string, { en: string; id: string; colour: string }> = {
   warning: { en: "Warning", id: "Peringatan", colour: "var(--smoke)" },
@@ -74,10 +74,12 @@ export function Warnings() {
   const plotBot = h - 46;
   const x = (ms: number) => (ms < b0 ? ((ms - a0) / (b0 - a0)) * aW : bX + ((ms - b0) / (b1 - b0)) * bW);
 
-  // Panel A: weekly Suomi-NPP totals for Indonesia.
+  // Panel A: weekly Suomi-NPP totals for Indonesia. Panel B uses the same series when the archive covers the case
+  // year from 1 January (then both panels share one scale); otherwise SiPongi's monthly counts.
   const weekly: [number, number][] = [];
+  const weeklyB: [number, number][] = [];
   if (season) {
-    for (let y = firstYear; y < caseYear; y++) {
+    for (let y = firstYear; y <= caseYear; y++) {
       const arr = season.years[String(y)]?.ID;
       if (!arr) continue;
       for (let i = 0; i + 7 <= arr.length; i += 7) {
@@ -88,16 +90,19 @@ export function Warnings() {
           if (v == null) ok = false;
           else s += v;
         }
-        if (ok) weekly.push([Date.UTC(y, 0, 1) + (i + 3) * 86400000, s]);
+        if (ok) (y === caseYear ? weeklyB : weekly).push([Date.UTC(y, 0, 1) + (i + 3) * 86400000, s]);
       }
     }
   }
-  const aMax = Math.max(1, ...weekly.map((p) => p[1]));
+  const snppB = Boolean(season?.coverage_2026 && season.coverage_2026[0] <= `${caseYear}-01-01` && weeklyB.length > 8);
+  const aMax = Math.max(1, ...weekly.map((p) => p[1]), ...(snppB ? weeklyB.map((p) => p[1]) : []));
   const ay = (v: number) => plotBot - (v / aMax) * (plotBot - plotTop);
   const areaA = weekly.length ? `M${x(weekly[0]![0]).toFixed(1)},${plotBot}` + weekly.map((p) => `L${x(p[0]).toFixed(1)},${ay(p[1]).toFixed(1)}`).join("") + `L${x(weekly[weekly.length - 1]![0]).toFixed(1)},${plotBot}Z` : "";
 
-  // Panel B: monthly SiPongi NOAA-20 high confidence.
-  const months = Object.entries(numbers?.monthly_sipongi_n20_high ?? {})
+  const areaB = snppB ? `M${x(weeklyB[0]![0]).toFixed(1)},${plotBot}` + weeklyB.map((p) => `L${x(p[0]).toFixed(1)},${ay(p[1]).toFixed(1)}`).join("") + `L${x(weeklyB[weeklyB.length - 1]![0]).toFixed(1)},${plotBot}Z` : "";
+
+  // Panel B fallback: monthly SiPongi NOAA-20 high confidence.
+  const months = snppB ? [] : Object.entries(numbers?.monthly_sipongi_n20_high ?? {})
     .filter(([k, v]) => k.startsWith(String(caseYear)) && /^\d{4}-\d{2}$/.test(k) && typeof v === "number")
     .sort(([p], [q]) => (p < q ? -1 : 1));
   const bMax = Math.max(1, ...months.map(([, v]) => v));
@@ -130,11 +135,21 @@ export function Warnings() {
                   {caseYear}
                 </text>
                 <text x={bX} y={25} style={{ fontSize: fs }}>
-                  {tr(lang, { en: "NOAA-20 high conf., monthly (SiPongi)", id: "NOAA-20 keyakinan tinggi, bulanan (SiPongi)" })}
+                  {snppB ? tr(lang, { en: "Suomi-NPP, weekly, same scale", id: "Suomi-NPP, mingguan, skala sama" }) : tr(lang, { en: "NOAA-20 high conf., monthly (SiPongi)", id: "NOAA-20 keyakinan tinggi, bulanan (SiPongi)" })}
                 </text>
                 <line className="axis" x1={0} x2={aW} y1={plotBot} y2={plotBot} />
                 <line className="axis" x1={bX} x2={w} y1={plotBot} y2={plotBot} />
                 {areaA ? <path d={areaA} fill="var(--ash)" opacity={0.42} /> : null}
+                {areaB ? <path d={areaB} fill="var(--ember)" opacity={0.85} /> : null}
+                {snppB
+                  ? Array.from({ length: 11 }, (_, m) => m)
+                      .filter((m) => (narrow ? m % 2 === 0 : true))
+                      .map((m) => (
+                        <text key={m} x={(x(Date.UTC(caseYear, m, 1)) + x(Date.UTC(caseYear, m + 1, 1))) / 2} y={plotBot + 14} textAnchor="middle" style={{ fontSize: fs }}>
+                          {monthShort(m, lang)}
+                        </text>
+                      ))
+                  : null}
                 {weekly.length ? (
                   <text x={aW - 2} y={plotTop + 10} textAnchor="end" style={{ fontSize: fs }}>
                     {tr(lang, { en: "max", id: "maks" })} {fmtAxis(aMax, lang)}

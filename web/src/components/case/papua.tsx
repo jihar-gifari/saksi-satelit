@@ -10,28 +10,26 @@ import { weekKnow } from "./how-bad";
 import { PolicyCheck } from "./policy-check";
 import { MapWindow } from "./window";
 
+/** The chapter's numbers are for Papua Selatan province (provinces.json), the unit the videos use. */
+export const PAPUA_SELATAN = "ID-PS";
+const REGENCIES = "Merauke, Boven Digoel, Mappi, Asmat";
+
 export function Papua() {
   const lang = useLang();
   const papua = useReady("papua");
+  const provinces = useReady("provinces");
   const summary = useReady("summary");
   const smoke = useSceneState((s) => s.smoke);
   const failed = useSceneState((s) => s.failed);
-  if (!papua) return null;
-  const years = Object.keys(papua.by_year).sort();
-  const last = years[years.length - 1]!;
-  const count = papua.by_year[last] ?? 0;
-  const rank: WeekRank = {
-    count,
-    rank: papua.rank ?? 1 + years.filter((y) => y !== last && (papua.by_year[y] ?? 0) > count).length,
-    of: years.length,
-    since: Number(years[0]),
-    higher: years.filter((y) => y !== last && (papua.by_year[y] ?? 0) > count).map(Number),
-    median: papua.median_2012_2025,
-    by_year: papua.by_year,
-  };
-  const times = papua.median_2012_2025 > 0 ? count / papua.median_2012_2025 : null;
-  const range = fmtRange(papua.week.start, papua.week.end, lang);
-  const regencies = papua.regencies?.join(", ");
+  const ps = provinces?.provinces.find((p) => p.id === PAPUA_SELATAN);
+  const rank = ps?.snpp_week;
+  if (!ps || !rank) return null;
+  const week = provinces?.window ?? (summary?.week ? ([summary.week.start, summary.week.end] as [string, string]) : null);
+  const count = rank.count;
+  const times = rank.median > 0 ? count / rank.median : null;
+  const range = week ? fmtRange(week[0], week[1], lang) : "";
+  const since = rank.since ?? Number(Object.keys(rank.by_year).sort()[0] ?? 2012);
+  const name = lang === "id" ? ps.name_id : "Papua Selatan";
 
   return (
     <MapWindow id="papua" scene="papua" labelledBy="papua-h">
@@ -39,16 +37,26 @@ export function Papua() {
         <div className="card">
           <ChapterHead n="03" id="papua-h" en={["The forgotten", "epicentre"]} idn={["Pusat api", "yang terlupakan"]} />
           <p className="statement">
-            {tr(lang, {
-              en: `Southern Papua${regencies ? ` (${regencies})` : ""}: `,
-              id: `Papua bagian selatan${regencies ? ` (${regencies})` : ""}: `,
-            })}
+            {`${name} (${REGENCIES}): `}
             <b className="num">{fmtInt(count, lang)}</b>
             {tr(lang, {
-              en: ` detections in ${range}, ${rank.rank === 1 ? `the most for this week since ${rank.since}` : `the ${ordinal(rank.rank, "en")} most since ${rank.since}`}${times ? `, and ${fmtTimes(times, "en")} its median.` : "."}`,
-              id: ` deteksi pada ${range}, ${rank.rank === 1 ? `terbanyak untuk minggu ini sejak ${rank.since}` : `terbanyak ${ordinal(rank.rank, "id")} sejak ${rank.since}`}${times ? `, dan ${fmtTimes(times, "id")} mediannya.` : "."}`,
+              en: ` detections${range ? ` in ${range}` : ""}, ${rank.rank === 1 ? `the most for this week since ${since}` : `the ${ordinal(rank.rank, "en")} most since ${since}`}${times ? `, and ${fmtTimes(times, "en")} its median.` : "."}`,
+              id: ` deteksi${range ? ` pada ${range}` : ""}, ${rank.rank === 1 ? `terbanyak untuk minggu ini sejak ${since}` : `terbanyak ${ordinal(rank.rank, "id")} sejak ${since}`}${times ? `, dan ${fmtTimes(times, "id")} mediannya.` : "."}`,
             })}
-            <Know item={{ ...weekKnow(papua.week.start, papua.week.end, "PAPS"), value: fmtInt(count, lang), note: { en: `Southern Papua here is a fixed box, ${papua.box[0]}–${papua.box[2]}°E and ${Math.abs(papua.box[1])}–${Math.abs(papua.box[3])}°S, drawn dashed on the map.`, id: `Papua bagian selatan di sini adalah kotak tetap, ${papua.box[0]}–${papua.box[2]}°BT dan ${Math.abs(papua.box[1])}–${Math.abs(papua.box[3])}°LS, digambar putus-putus di peta.` } }} />
+            {week ? (
+              <Know
+                item={{
+                  ...weekKnow(week[0], week[1], "ID"),
+                  title: { en: "Same week, every year: Papua Selatan", id: "Minggu yang sama, setiap tahun: Papua Selatan" },
+                  value: fmtInt(count, lang),
+                  note: {
+                    en: `Counted inside the outline of Papua Selatan province (${REGENCIES}), built from geoBoundaries regency outlines (ODbL). Median of the same week in ${since}–${Number(Object.keys(rank.by_year).sort().slice(-1)[0]) - 1}: ${fmtInt(rank.median, "en")}.`,
+                    id: `Dihitung di dalam batas Provinsi Papua Selatan (${REGENCIES}), disusun dari batas kabupaten geoBoundaries (ODbL). Median minggu yang sama ${since}–${Number(Object.keys(rank.by_year).sort().slice(-1)[0]) - 1}: ${fmtInt(rank.median, "id")}.`,
+                  },
+                  anchor: "papua",
+                }}
+              />
+            ) : null}
           </p>
           <p className="small">
             <T
@@ -59,9 +67,9 @@ export function Papua() {
           <WeekBars
             rank={rank}
             accent="var(--ember)"
-            label={tr(lang, { en: "Southern Papua, same week each year since 2012", id: "Papua bagian selatan, minggu yang sama setiap tahun sejak 2012" })}
+            label={tr(lang, { en: `Papua Selatan, same week each year since ${since}`, id: `Papua Selatan, minggu yang sama setiap tahun sejak ${since}` })}
           />
-          {papua.official || papua.independent ? (
+          {papua && (papua.official || papua.independent) ? (
             <div className="duo">
               <p className="kicker" style={{ gridColumn: "1 / -1" }}>
                 {tr(lang, { en: "Burned area, Papua Selatan province", id: "Luas terbakar, Provinsi Papua Selatan" })}
@@ -86,7 +94,7 @@ export function Papua() {
               ) : null}
             </div>
           ) : null}
-          {papua.official || papua.independent ? (
+          {papua && (papua.official || papua.independent) ? (
             <KnowLink
               item={{
                 title: { en: "Burned area in Papua Selatan", id: "Luas terbakar di Papua Selatan" },
@@ -107,7 +115,7 @@ export function Papua() {
               }}
             />
           ) : null}
-          {papua.walhi_psn_hotspots_jan_aug ? (
+          {papua?.walhi_psn_hotspots_jan_aug ? (
             <p className="small">
               {tr(lang, {
                 en: `WALHI counted ${fmtInt(papua.walhi_psn_hotspots_jan_aug.value, "en")} hotspots inside National Strategic Project (PSN) areas in Papua from January to August.`,

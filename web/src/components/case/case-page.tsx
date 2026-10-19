@@ -11,7 +11,7 @@ import { Hero } from "./hero";
 import { HowBad } from "./how-bad";
 import { MethodsTeaser } from "./methods-teaser";
 import { NumbersWar } from "./numbers";
-import { Papua } from "./papua";
+import { Papua, PAPUA_SELATAN } from "./papua";
 import { YourProvince } from "./province";
 import { SamePlaces } from "./same-places";
 import { Stage } from "./stage";
@@ -31,8 +31,10 @@ const CHAPTERS = [
 function useMarquee(): MarqueeItem[][] {
   const lang = useLang();
   const s = useReady("summary");
+  const provinces = useReady("provinces");
   const r = s?.week?.regions.ID;
-  const paps = s?.week?.regions.PAPS;
+  // Papua Selatan province, the same number the Papua chapter and the videos use.
+  const ps = provinces?.provinces.find((p) => p.id === PAPUA_SELATAN)?.snpp_week;
   if (!s?.week || !r) return [];
   const range = fmtRange(s.week.start, s.week.end, lang, false).toUpperCase();
   const row1: MarqueeItem[] = [
@@ -44,7 +46,7 @@ function useMarquee(): MarqueeItem[][] {
     { text: "Kalimantan", style: "o" },
     { text: lang === "id" ? "Sumatera" : "Sumatra", style: "c" },
     { text: "Papua", style: "e" },
-    ...(paps ? [{ text: `${fmtInt(paps.count, lang)} ${lang === "id" ? "di Papua selatan" : "in southern Papua"}`, style: "x" as const }] : []),
+    ...(ps ? [{ text: `${fmtInt(ps.count, lang)} ${lang === "id" ? "di Papua Selatan" : "in Papua Selatan"}`, style: "x" as const }] : []),
   ];
   return [row1, row2];
 }

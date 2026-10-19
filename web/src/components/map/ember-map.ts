@@ -16,6 +16,7 @@ import type { SceneName, SceneState } from "./scene";
  */
 
 const MAPLIBRE_VERSION = "6.15.0";
+const PAPUA_SELATAN = "ID-PS";
 const INDONESIA: [[number, number], [number, number]] = [
   [95, -11],
   [141.2, 6],
@@ -454,22 +455,30 @@ export class EmberMap {
       case "recurrence":
         return fit(INDONESIA, "recurrence", 5.2);
       case "papua": {
-        const b = this.box ?? [137.5, -9.2, 140.95, -5.5];
-        return fit([[b[0], b[1]], [b[2], b[3]]], "papua", 7.2, this.narrow ? 25 : 38, -14);
+        // Papua Selatan province; the fixed box from papua.json only if the outline is missing.
+        const pb = this.bounds(PAPUA_SELATAN);
+        const b = pb ?? (this.box ? ([[this.box[0], this.box[1]], [this.box[2], this.box[3]]] as [[number, number], [number, number]]) : ([[137.5, -9.2], [140.95, -5.5]] as [[number, number], [number, number]]));
+        return fit(b, "papua", 7.2, this.narrow ? 25 : 38, -14);
       }
       case "province": {
-        const p = this.provinces?.provinces.find((x) => x.id === s.province);
-        if (!p) return fit(INDONESIA, "province", 5.2);
-        let w = 180, so = 90, e = -180, n = -90;
-        for (const r of p.rings) for (const [x, y] of r as [number, number][]) {
-          if (x < w) w = x;
-          if (x > e) e = x;
-          if (y < so) so = y;
-          if (y > n) n = y;
-        }
-        return fit([[w, so], [e, n]], "province", 7.4, this.narrow ? 0 : 20, 0);
+        const b = s.province ? this.bounds(s.province) : null;
+        if (!b) return fit(INDONESIA, "province", 5.2);
+        return fit(b, "province", 7.4, this.narrow ? 0 : 20, 0);
       }
     }
+  }
+
+  private bounds(id: string): [[number, number], [number, number]] | null {
+    const p = this.provinces?.provinces.find((x) => x.id === id);
+    if (!p) return null;
+    let w = 180, so = 90, e = -180, n = -90;
+    for (const r of p.rings) for (const [x, y] of r as [number, number][]) {
+      if (x < w) w = x;
+      if (x > e) e = x;
+      if (y < so) so = y;
+      if (y > n) n = y;
+    }
+    return [[w, so], [e, n]];
   }
 
   setScene(next: SceneState) {
@@ -482,10 +491,10 @@ export class EmberMap {
 
   private applyScene(next: SceneState, prev: SceneState | null) {
     // Highlighted province.
-    const id = next.scene === "province" && next.province ? next.province : "";
+    const id = next.scene === "province" && next.province ? next.province : next.scene === "papua" && this.bounds(PAPUA_SELATAN) ? PAPUA_SELATAN : "";
     this.map.setFilter("prov-hl", ["==", ["get", "id"], id]);
     this.map.setFilter("prov-hl-fill", ["==", ["get", "id"], id]);
-    this.map.setPaintProperty("box", "line-opacity", next.scene === "papua" ? 0.7 : 0);
+    this.map.setPaintProperty("box", "line-opacity", next.scene === "papua" && !this.bounds(PAPUA_SELATAN) ? 0.7 : 0);
     this.applySmoke();
 
     this.target = {

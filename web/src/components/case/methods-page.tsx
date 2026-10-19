@@ -36,8 +36,8 @@ const SECTIONS: Sec[] = [
         id: "Agar perbandingan antartahun adil, kami memakai satu satelit, Suomi-NPP, satu-satunya satelit VIIRS yang terbang setiap tahun sejak 2012, dan tujuh hari kalender yang sama setiap tahun. 2012–2025 berasal dari arsip standar FIRMS dan 2026 dari data hampir waktu nyata; kedua jalur pemrosesan bisa sedikit berbeda. Peringkat dan daftar tahun yang lebih tinggi dihitung oleh pipeline, bukan ditulis tangan. Median dihitung dari tahun-tahun sebelum tahun berjalan.",
       },
       {
-        en: "The season chart is the running seven-day total of the same series, so its value on the last day of the week equals that year's bar. 2026 is drawn only where the archive holds seven consecutive days.",
-        id: "Grafik musim adalah total tujuh hari berjalan dari seri yang sama, sehingga nilainya pada hari terakhir minggu itu sama dengan batang tahun tersebut. 2026 hanya digambar pada tanggal yang punya tujuh hari berturut-turut di arsip.",
+        en: "The season chart adds up the same series since 1 January, and compares this year with 2015 over exactly the same dates. Its seven-day view is the running seven-day total, so its value on the last day of the week equals that year's bar.",
+        id: "Grafik musim menjumlahkan seri yang sama sejak 1 Januari, dan membandingkan tahun ini dengan 2015 pada tanggal yang persis sama. Tampilan tujuh harinya adalah total tujuh hari berjalan, sehingga nilainya pada hari terakhir minggu itu sama dengan batang tahun tersebut.",
       },
     ],
   },
@@ -58,12 +58,12 @@ const SECTIONS: Sec[] = [
   },
   {
     id: "papua",
-    en: "Southern Papua",
-    idn: "Papua bagian selatan",
+    en: "Papua Selatan",
+    idn: "Papua Selatan",
     body: [
       {
-        en: "Southern Papua is a fixed box (137.5–140.95°E, 5.5–9.2°S) covering Merauke, Boven Digoel and Mappi, compared with itself in the same week of every year since 2012 using Suomi-NPP. Its savanna burns in most dry seasons, which is why the comparison is with its own past rather than with other regions. Burned area for Papua Selatan province is shown from SiPongi and from an independent Sentinel-2 product as reported.",
-        id: "Papua bagian selatan adalah kotak tetap (137,5–140,95°BT, 5,5–9,2°LS) yang mencakup Merauke, Boven Digoel, dan Mappi, dibandingkan dengan dirinya sendiri pada minggu yang sama setiap tahun sejak 2012 memakai Suomi-NPP. Savananya terbakar hampir setiap musim kemarau, karena itu pembandingnya adalah masa lalunya sendiri, bukan wilayah lain. Luas terbakar Provinsi Papua Selatan ditampilkan dari SiPongi dan dari produk Sentinel-2 independen seperti yang diberitakan.",
+        en: "The Papua chapter counts Suomi-NPP detections inside Papua Selatan province (the Merauke, Boven Digoel, Mappi and Asmat regencies), using a province outline built from geoBoundaries regency outlines, and compares the province with itself in the same week of every year since 2012. Its savanna burns in most dry seasons, which is why the comparison is with its own past rather than with other regions. Burned area for the province is shown from SiPongi and from an independent Sentinel-2 product as reported, and WALHI's count of hotspots in National Strategic Project areas is quoted as published.",
+        id: "Bab Papua menghitung deteksi Suomi-NPP di dalam Provinsi Papua Selatan (Kabupaten Merauke, Boven Digoel, Mappi, dan Asmat), memakai batas provinsi yang disusun dari batas kabupaten geoBoundaries, dan membandingkan provinsi ini dengan dirinya sendiri pada minggu yang sama setiap tahun sejak 2012. Savananya terbakar hampir setiap musim kemarau, karena itu pembandingnya adalah masa lalunya sendiri, bukan wilayah lain. Luas terbakar provinsi ditampilkan dari SiPongi dan dari produk Sentinel-2 independen seperti yang diberitakan, dan hitungan WALHI atas titik panas di kawasan Proyek Strategis Nasional dikutip sesuai publikasi.",
       },
     ],
   },
