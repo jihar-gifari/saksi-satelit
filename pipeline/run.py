@@ -60,9 +60,20 @@ PAPUA_2022 = {  # provinces created in 2022, built from their regencies (geoBoun
 }
 
 
+GEOB = 'https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/IDN/{0}/geoBoundaries-IDN-{0}_simplified.geojson'
+
+
+def boundary(level):
+    path = os.path.join(CACHE, f'idn_{level.lower()}.geojson')
+    if not os.path.exists(path):
+        os.makedirs(CACHE, exist_ok=True)
+        open(path, 'wb').write(get(GEOB.format(level), timeout=300))
+    return json.load(open(path))
+
+
 def build_provinces():
-    adm1 = json.load(open(os.path.join(CACHE, 'idn_adm1.geojson')))
-    adm2 = json.load(open(os.path.join(CACHE, 'idn_adm2.geojson')))
+    adm1 = boundary('ADM1')
+    adm2 = boundary('ADM2')
     provs = []
     for f in adm1['features']:
         n = f['properties']['shapeName']
@@ -374,9 +385,11 @@ def main():
         for row in data['data']:
             official[row['nama_provinsi']] = {str(x['tahun']): float(x['luas'].replace('.', '').replace(',', '.')) for x in row['data_luas']}
         monthly = json.loads(get(f'{SIPONGI}/grafik/hotspot?text=NASA&satelit=NASA-NOAA20&tahun=2026'))['data']
+        save_json(os.path.join(STATE, 'sipongi_last.json'), {'retrieved_at': now_iso(), 'official': official, 'monthly': monthly})
     except Exception as e:
-        print('SiPongi unavailable:', e, flush=True)
-        monthly = None
+        print('SiPongi unavailable, using the last good copy:', e, flush=True)
+        last = load_json(os.path.join(STATE, 'sipongi_last.json'), {})
+        official, monthly = last.get('official', {}), last.get('monthly')
     off_total_2026 = round(sum(v.get('2026', 0) for v in official.values()), 2) if official else None
     off_total_2025 = round(sum(v.get('2025', 0) for v in official.values()), 2) if official else None
 
